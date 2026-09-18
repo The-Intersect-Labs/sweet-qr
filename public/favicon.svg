@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="SweetQR">
+  <defs>
+    <linearGradient id="sweetqr-mark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6366f1" />
+      <stop offset="1" stop-color="#8b5cf6" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#sweetqr-mark)" />
+  <g fill="none" stroke="#fff" stroke-width="26" stroke-linecap="round">
+    <rect x="116" y="116" width="88" height="88" rx="22" />
+    <rect x="308" y="116" width="88" height="88" rx="22" />
+    <rect x="116" y="308" width="88" height="88" rx="22" />
+  </g>
+  <g fill="#fff">
+    <circle cx="160" cy="160" r="15" />
+    <circle cx="352" cy="160" r="15" />
+    <circle cx="160" cy="352" r="15" />
+    <rect x="240" y="116" width="26" height="26" rx="13" />
+    <rect x="240" y="176" width="26" height="26" rx="13" />
+    <rect x="116" y="240" width="26" height="26" rx="13" />
+    <rect x="176" y="240" width="26" height="26" rx="13" />
+    <rect x="240" y="240" width="26" height="26" rx="13" />
+    <rect x="300" y="240" width="26" height="26" rx="13" />
+    <rect x="360" y="240" width="26" height="26" rx="13" />
+    <rect x="240" y="300" width="26" height="26" rx="13" />
+    <rect x="300" y="300" width="26" height="26" rx="13" />
+    <rect x="360" y="300" width="26" height="26" rx="13" />
+    <rect x="240" y="360" width="26" height="26" rx="13" />
+    <rect x="300" y="360" width="26" height="26" rx="13" />
+  </g>
+</svg>
