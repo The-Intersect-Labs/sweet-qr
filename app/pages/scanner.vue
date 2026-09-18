@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { toast } from 'vue-sonner'
+import { useMediaQuery, usePreferredReducedMotion } from '@vueuse/core'
 import { CameraIcon, HistoryIcon, ImageIcon, InfoIcon, ScanLineIcon } from '@lucide/vue'
 import type { ScanResult } from '~/types'
 import { parseQrPayload } from '~/lib/qr/parse'
@@ -11,6 +12,34 @@ const { record, historyEnabled } = useScanHistory()
 
 const tab = ref<'camera' | 'upload'>('camera')
 const result = ref<ScanResult | null>(null)
+const resultPanel = ref<HTMLElement | null>(null)
+
+/** Matches the `lg` breakpoint, below which the results sit under the scanner. */
+const isStackedLayout = useMediaQuery('(max-width: 1023px)')
+const reducedMotion = usePreferredReducedMotion()
+
+/**
+ * On narrow screens the result lands below the fold, so bring it into view. Skipped on
+ * wide screens (where it is already beside the scanner), when it is already visible, and
+ * for users who asked for reduced motion.
+ */
+async function revealResult() {
+  if (!isStackedLayout.value) return
+
+  // The card is rendered by v-if, so wait for it to be in the DOM.
+  await nextTick()
+
+  const element = resultPanel.value
+  if (!element) return
+
+  const { top } = element.getBoundingClientRect()
+  if (top >= 0 && top < window.innerHeight * 0.4) return
+
+  element.scrollIntoView({
+    behavior: reducedMotion.value === 'reduce' ? 'auto' : 'smooth',
+    block: 'start',
+  })
+}
 
 function onScan(raw: string) {
   const parsed = parseQrPayload(raw)
@@ -20,6 +49,8 @@ function onScan(raw: string) {
   toast.success('Scanned', {
     description: saved?.label ?? 'History is off, so this was not saved.',
   })
+
+  void revealResult()
 }
 
 function scanAgain() {
@@ -70,7 +101,8 @@ function saveAsQrCode() {
         </CardContent>
       </Card>
 
-      <div class="grid gap-4">
+      <!-- scroll-mt clears the sticky header when we scroll this into view -->
+      <div ref="resultPanel" class="grid scroll-mt-20 gap-4">
         <Card v-if="result">
           <CardContent class="grid gap-4 pt-6">
             <ScanResult :result="result" />
