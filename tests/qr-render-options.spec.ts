@@ -43,6 +43,52 @@ describe('colours and gradients', () => {
     expect(options.dotsOptions?.gradient).toBeUndefined()
   })
 
+  /**
+   * Regression: `QRCodeStyling.update()` merges new options into the previous ones and
+   * only visits keys present on the new object, so an omitted `gradient` kept a
+   * previously-applied gradient forever. Every colour block must therefore carry both
+   * keys explicitly — `gradient: undefined` is what actually clears it.
+   */
+  it('always includes both colour keys so a disabled gradient is cleared', () => {
+    const flat = buildQrOptions({ payload: 'x', style: style({ fgColor: '#123456', fgGradient: null }) })
+
+    expect(Object.keys(flat.dotsOptions ?? {})).toContain('gradient')
+    expect(Object.keys(flat.cornersSquareOptions ?? {})).toContain('gradient')
+    expect(Object.keys(flat.cornersDotOptions ?? {})).toContain('gradient')
+    expect(Object.keys(flat.backgroundOptions ?? {})).toContain('gradient')
+  })
+
+  it('clears the background gradient too when it is turned off', () => {
+    const options = buildQrOptions({
+      payload: 'x',
+      style: style({ bgColor: '#ffffff', bgGradient: null }),
+    })
+
+    expect('gradient' in (options.backgroundOptions ?? {})).toBe(true)
+    expect(options.backgroundOptions?.gradient).toBeUndefined()
+    expect(options.backgroundOptions?.color).toBe('#ffffff')
+  })
+
+  it('drops the flat colour key when a gradient is active', () => {
+    const options = buildQrOptions({
+      payload: 'x',
+      style: style({
+        fgGradient: {
+          type: 'linear',
+          rotation: 0,
+          colorStops: [
+            { offset: 0, color: '#000000' },
+            { offset: 1, color: '#ffffff' },
+          ],
+        },
+      }),
+    })
+
+    expect(Object.keys(options.dotsOptions ?? {})).toContain('color')
+    expect(options.dotsOptions?.color).toBeUndefined()
+    expect(options.dotsOptions?.gradient).toBeDefined()
+  })
+
   it('converts gradient rotation from degrees to radians', () => {
     const options = buildQrOptions({
       payload: 'x',
@@ -62,7 +108,6 @@ describe('colours and gradients', () => {
     // Corners follow the same gradient as the dots.
     expect(options.cornersSquareOptions?.gradient).toBeDefined()
     expect(options.cornersDotOptions?.gradient).toBeDefined()
-    expect(options.dotsOptions?.color).toBeUndefined()
   })
 
   it('passes a transparent background straight through', () => {

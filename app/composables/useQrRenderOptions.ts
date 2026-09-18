@@ -21,6 +21,20 @@ function toGradient(gradient: QrGradient) {
   }
 }
 
+/**
+ * Builds the colour half of a style block with BOTH keys always present.
+ *
+ * `QRCodeStyling.update()` deep-merges new options into the existing ones and only
+ * visits keys present on the new object, so anything omitted keeps its previous value.
+ * Omitting `gradient` when there is none would leave a previously-applied gradient in
+ * place forever — hence the explicit `undefined` rather than a conditional spread.
+ */
+function colourOptions(colour: string, gradient: QrGradient | null) {
+  return gradient
+    ? { color: undefined, gradient: toGradient(gradient) }
+    : { color: colour, gradient: undefined }
+}
+
 export interface BuildQrOptionsInput {
   payload: string
   style: QrStyleState
@@ -56,18 +70,16 @@ export function buildQrOptions({
     },
     dotsOptions: {
       type: style.dotStyle,
-      ...(style.fgGradient ? { gradient: toGradient(style.fgGradient) } : { color: style.fgColor }),
+      ...colourOptions(style.fgColor, style.fgGradient),
     },
-    backgroundOptions: {
-      ...(style.bgGradient ? { gradient: toGradient(style.bgGradient) } : { color: style.bgColor }),
-    },
+    backgroundOptions: colourOptions(style.bgColor, style.bgGradient),
     cornersSquareOptions: {
       type: style.cornerSquareStyle,
-      ...(style.fgGradient ? { gradient: toGradient(style.fgGradient) } : { color: style.fgColor }),
+      ...colourOptions(style.fgColor, style.fgGradient),
     },
     cornersDotOptions: {
       type: style.cornerDotStyle,
-      ...(style.fgGradient ? { gradient: toGradient(style.fgGradient) } : { color: style.fgColor }),
+      ...colourOptions(style.fgColor, style.fgGradient),
     },
   }
 }
