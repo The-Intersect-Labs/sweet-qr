@@ -59,7 +59,12 @@ export default defineNuxtPlugin(() => {
   if (registered) return
   registered = true
 
+  const savedCodes = persistentState<SavedQrCode[]>(STORAGE_KEYS.saved, () => [], mergeSavedCodes)
   persistentState<AppSettings>(STORAGE_KEYS.settings, createDefaultSettings, mergeSettings)
-  persistentState<SavedQrCode[]>(STORAGE_KEYS.saved, () => [], mergeSavedCodes)
   persistentState<ScanHistoryEntry[]>(STORAGE_KEYS.history, () => [], normalizeScanHistory)
+
+  // Ask the browser to protect this origin's storage from automatic eviction. Only worth
+  // asking once there is a library to lose, and never blocking app start on it.
+  const { requestIfNeeded } = useStoragePersistence()
+  void requestIfNeeded(savedCodes.value.length > 0)
 })

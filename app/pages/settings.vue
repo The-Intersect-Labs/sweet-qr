@@ -9,6 +9,39 @@ useSeoMeta({ title: 'Settings · SweetQR' })
 const { settings, updateSettings, updateDefaultStyle, resetDefaultStyle, setHistoryEnabled } = useSettings()
 const { codes, clear: clearCodes } = useSavedQrCodes()
 const { entries, clear: clearHistory } = useScanHistory()
+const { state: persistenceState, refresh: refreshPersistence, request: requestPersistence } =
+  useStoragePersistence()
+
+onMounted(() => {
+  void refreshPersistence()
+})
+
+const persistenceCopy = computed(() => {
+  switch (persistenceState.value) {
+    case 'granted':
+      return {
+        title: 'Your library is protected',
+        detail:
+          'This browser has agreed not to clear SweetQR automatically when the device runs low on space.',
+      }
+    case 'requesting':
+      return { title: 'Asking your browser…', detail: 'Confirm the prompt to protect your library.' }
+    case 'unsupported':
+      return {
+        title: 'Persistent storage is not available here',
+        detail:
+          'This browser (Safari) does not offer it. Adding SweetQR to your home screen is what stops your data being cleared automatically.',
+      }
+    case 'denied':
+      return {
+        title: 'Your library is not protected yet',
+        detail:
+          'This browser may clear SweetQR\u2019s data if it runs low on space. Installing the app usually grants protection.',
+      }
+    default:
+      return { title: 'Storage protection unknown', detail: 'Checking whether this browser will keep your library safe.' }
+  }
+})
 
 const colorMode = useColorMode()
 
@@ -193,31 +226,60 @@ function runConfirmedAction() {
               in this browser.
             </CardDescription>
           </CardHeader>
-          <CardContent class="flex flex-wrap gap-2">
-            <Button
-              variant="outline"
-              :disabled="storedSummary.codes === 0"
-              @click="requestAction('codes')"
-            >
-              <Trash2Icon />
-              Delete saved codes
-            </Button>
-            <Button
-              variant="outline"
-              :disabled="storedSummary.entries === 0"
-              @click="requestAction('history')"
-            >
-              <Trash2Icon />
-              Clear scan history
-            </Button>
-            <Button
-              variant="outline"
-              class="text-destructive hover:bg-destructive/10"
-              @click="requestAction('everything')"
-            >
-              <DatabaseIcon />
-              Erase everything
-            </Button>
+          <CardContent class="grid gap-4">
+            <div class="flex items-start gap-3 rounded-lg border p-3">
+              <span
+                class="grid size-9 shrink-0 place-items-center rounded-lg"
+                :class="
+                  persistenceState === 'granted'
+                    ? 'bg-primary/10 text-primary'
+                    : 'bg-muted text-muted-foreground'
+                "
+                aria-hidden="true"
+              >
+                <ShieldCheckIcon class="size-4" />
+              </span>
+              <div class="grid min-w-0 gap-0.5">
+                <p class="text-sm font-medium">{{ persistenceCopy.title }}</p>
+                <p class="text-muted-foreground text-xs text-pretty">{{ persistenceCopy.detail }}</p>
+              </div>
+              <Button
+                v-if="persistenceState === 'denied'"
+                variant="outline"
+                size="sm"
+                class="ml-auto shrink-0"
+                @click="requestPersistence"
+              >
+                Protect
+              </Button>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+              <Button
+                variant="outline"
+                :disabled="storedSummary.codes === 0"
+                @click="requestAction('codes')"
+              >
+                <Trash2Icon />
+                Delete saved codes
+              </Button>
+              <Button
+                variant="outline"
+                :disabled="storedSummary.entries === 0"
+                @click="requestAction('history')"
+              >
+                <Trash2Icon />
+                Clear scan history
+              </Button>
+              <Button
+                variant="outline"
+                class="text-destructive hover:bg-destructive/10"
+                @click="requestAction('everything')"
+              >
+                <DatabaseIcon />
+                Erase everything
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
