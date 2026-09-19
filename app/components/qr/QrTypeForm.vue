@@ -106,7 +106,7 @@ function update(key: string, value: QrFormValue) {
             :type="revealed[field.key] ? 'text' : 'password'"
             :placeholder="field.placeholder"
             :autocomplete="field.autocomplete ?? 'off'"
-            class="pr-9"
+            class="pr-10"
             :aria-invalid="Boolean(errors[field.key])"
             :aria-describedby="describedBy(field.key, Boolean(field.help))"
             @update:model-value="(value) => update(field.key, String(value))"

@@ -104,13 +104,13 @@ const gradientPreview = computed(() => {
         :id="`${label}-color`"
         type="color"
         :value="pickerValue"
-        class="border-input size-8 shrink-0 cursor-pointer rounded-lg border bg-transparent p-0.5"
+        class="border-input size-9 shrink-0 cursor-pointer rounded-lg border bg-transparent p-0.5"
         :aria-label="`${label} colour`"
         @input="emit('update:color', ($event.target as HTMLInputElement).value)"
       />
       <Input
         :model-value="hexDraft"
-        class="h-8 font-mono text-xs"
+        class="h-9 font-mono text-xs"
         spellcheck="false"
         :aria-label="`${label} hex value`"
         @update:model-value="(value) => onHexInput(String(value))"
@@ -181,13 +181,13 @@ const gradientPreview = computed(() => {
           <input
             type="color"
             :value="stop.color"
-            class="border-input size-7 shrink-0 cursor-pointer rounded-md border bg-transparent p-0.5"
+            class="border-input size-8 shrink-0 cursor-pointer rounded-md border bg-transparent p-0.5"
             :aria-label="`${label} gradient ${index === 0 ? 'start' : 'end'} colour`"
             @input="setStopColor(index, ($event.target as HTMLInputElement).value)"
           />
           <Input
             :model-value="stop.color"
-            class="h-7 font-mono text-xs"
+            class="h-8 font-mono text-xs"
             spellcheck="false"
             :aria-label="`${label} gradient ${index === 0 ? 'start' : 'end'} hex value`"
             @update:model-value="(value) => HEX_PATTERN.test(String(value).trim()) && setStopColor(index, String(value).trim())"

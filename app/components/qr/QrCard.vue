@@ -63,7 +63,7 @@ function commitRename() {
             <Input
               :id="`rename-${code.id}`"
               v-model="draft"
-              class="h-7 text-sm"
+              class="h-8 text-sm"
               maxlength="80"
               :aria-label="`Rename ${code.name}`"
               @blur="commitRename"
